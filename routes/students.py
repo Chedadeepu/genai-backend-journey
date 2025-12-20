@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from database.db import SessionLocal
 from database.models import Student as StudentModel
-from models.student import Student
+from models.student import StudentCreate, StudentResponse
+
 
 router = APIRouter()
 
@@ -14,12 +15,12 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/students")
+@router.get("/students", response_model=list[StudentResponse])
 def get_students(db: Session = Depends(get_db)):
     return db.query(StudentModel).all()
 
-@router.post("/students")
-def create_student(student: Student, db: Session = Depends(get_db)):
+@router.post("/students", response_model=StudentResponse)
+def create_student(student: StudentCreate, db: Session = Depends(get_db)):
     existing = db.query(StudentModel).filter(StudentModel.id == student.id).first()
     if existing:
         raise HTTPException(status_code=400, detail="Student with this ID already exists")
@@ -34,8 +35,8 @@ def create_student(student: Student, db: Session = Depends(get_db)):
     db.refresh(db_student)
     return db_student
 
-@router.put("/students/{student_id}")
-def update_student(student_id: int, student: Student, db: Session = Depends(get_db)):
+@router.put("/students/{student_id}", response_model=StudentResponse)
+def update_student(student_id: int, student: StudentCreate, db: Session = Depends(get_db)):
     db_student = db.query(StudentModel).filter(StudentModel.id == student_id).first()
     if not db_student:
         raise HTTPException(status_code=404, detail="Student not found")
