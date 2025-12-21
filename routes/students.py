@@ -4,10 +4,8 @@ from database.db import SessionLocal
 from database.models import Student as StudentModel
 from models.student import StudentCreate, StudentResponse
 
-
 router = APIRouter()
 
-# Dependency to get DB session
 def get_db():
     db = SessionLocal()
     try:
@@ -19,6 +17,13 @@ def get_db():
 def get_students(db: Session = Depends(get_db)):
     return db.query(StudentModel).all()
 
+@router.get("/students/{student_id}", response_model=StudentResponse)
+def get_student_by_id(student_id: int, db: Session = Depends(get_db)):
+    student = db.query(StudentModel).filter(StudentModel.id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    return student
+
 @router.post("/students", response_model=StudentResponse)
 def create_student(student: StudentCreate, db: Session = Depends(get_db)):
     existing = db.query(StudentModel).filter(StudentModel.id == student.id).first()
@@ -28,6 +33,7 @@ def create_student(student: StudentCreate, db: Session = Depends(get_db)):
     db_student = StudentModel(
         id=student.id,
         name=student.name,
+        email=student.email,
         course=student.course
     )
     db.add(db_student)
@@ -42,6 +48,7 @@ def update_student(student_id: int, student: StudentCreate, db: Session = Depend
         raise HTTPException(status_code=404, detail="Student not found")
 
     db_student.name = student.name
+    db_student.email = student.email
     db_student.course = student.course
     db.commit()
     db.refresh(db_student)
