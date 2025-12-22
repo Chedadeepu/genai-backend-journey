@@ -8,3 +8,13 @@ class Student(Base):
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     course = Column(String)
+
+from sqlalchemy import Column, Integer, String
+
+class Document(Base):
+    __tablename__ = "documents"
+
+    id = Column(Integer, primary_key=True, index=True)
+    filename = Column(String, index=True)
+    filepath = Column(String)
+

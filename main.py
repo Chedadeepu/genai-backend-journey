@@ -12,3 +12,8 @@ def root():
     return {"message": "Day 5: Database Integrated"}
 
 app.include_router(student_router)
+
+from routes.documents import router as document_router
+
+app.include_router(document_router)
+
