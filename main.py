@@ -16,4 +16,10 @@ app.include_router(student_router)
 from routes.documents import router as document_router
 
 app.include_router(document_router)
+from routes.ask import router as ask_router
+
+app.include_router(ask_router)
+from routes.ingest import router as ingest_router
+
+app.include_router(ingest_router)
 
