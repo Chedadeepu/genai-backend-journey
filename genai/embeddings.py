@@ -17,11 +17,17 @@ index = faiss.IndexFlatL2(dimension)
 text_chunks = []
 
 # Load persisted data if available
-if os.path.exists(INDEX_PATH) and os.path.exists(CHUNKS_PATH):
-    index = faiss.read_index(INDEX_PATH)
+# Load persisted data if available (safe for production)
+try:
+    if os.path.exists(INDEX_PATH) and os.path.exists(CHUNKS_PATH):
+        index = faiss.read_index(INDEX_PATH)
+        with open(CHUNKS_PATH, "r", encoding="utf-8") as f:
+            text_chunks = [line.strip() for line in f.readlines()]
+except Exception as e:
+    print("⚠️ Failed to load persisted embeddings:", e)
+    index = faiss.IndexFlatL2(dimension)
+    text_chunks = []
 
-    with open(CHUNKS_PATH, "r", encoding="utf-8") as f:
-        text_chunks = [line.strip() for line in f.readlines()]
 
 def chunk_text(text: str, chunk_size: int = 500):
     words = text.split()
