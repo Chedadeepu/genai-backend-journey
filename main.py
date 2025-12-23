@@ -23,3 +23,8 @@ from routes.ingest import router as ingest_router
 
 app.include_router(ingest_router)
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+

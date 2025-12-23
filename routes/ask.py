@@ -16,7 +16,6 @@ def ask_question(request: QuestionRequest):
     answer = generate_answer(context, request.question)
 
     return {
-        "question": request.question,
-        "answer": answer,
-        "context_used": chunks
-    }
+    "question": request.question,
+    "answer": answer
+}
