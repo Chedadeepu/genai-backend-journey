@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from genai.embeddings import search_similar_chunks
+from genai.llm import generate_answer
 
 router = APIRouter()
 
@@ -9,9 +10,13 @@ class QuestionRequest(BaseModel):
 
 @router.post("/ask")
 def ask_question(request: QuestionRequest):
-    results = search_similar_chunks(request.question)
+    chunks = search_similar_chunks(request.question)
+
+    context = "\n".join(chunks)
+    answer = generate_answer(context, request.question)
 
     return {
         "question": request.question,
-        "answers": results
+        "answer": answer,
+        "context_used": chunks
     }
